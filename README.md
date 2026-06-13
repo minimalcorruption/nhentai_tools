@@ -39,7 +39,7 @@ import nhentai_tools
 ```python
 # Download gallery in gallery folder and embed metadata
 nhentai_tools.download(1337, path="gallery", metadata=True)
-#Downloaded files can be found in gallery/
+# Downloaded files can be found in gallery/
 ```
 
 ### Mass download by tag, character, artist or parody
