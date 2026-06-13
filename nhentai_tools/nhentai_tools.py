@@ -117,7 +117,7 @@ def extract_characters(gallery_id: int) -> list[str]:
 
     return characters_extracted
 
-def extract_languages(gallery_id):
+def extract_languages(gallery_id: int) -> list[str]:
     gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
 
     soup = BeautifulSoup(gallery.text, "html.parser")
@@ -140,7 +140,7 @@ def extract_languages(gallery_id):
 
     return languages_extracted
 
-def extract_category(galler_id):
+def extract_category(galler_id: int) -> list[str]:
     gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
 
     soup = BeautifulSoup(gallery.text, "html.parser")
@@ -162,6 +162,29 @@ def extract_category(galler_id):
         categories_extracted.append(category.get_text(strip=True))
 
     return categories_extracted
+
+def extract_artists(gallery_id: int) -> list[str]:
+    gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=request_headers)
+
+    soup = BeautifulSoup(gallery.text, "html.parser")
+
+    artists_container_regex = r"tag-container field-name svelte-.+"
+    artists_container = soup.find_all("div", {"class": re.compile(artists_container_regex)})
+
+    artists_span_container = artists_container[3]
+
+    artists_span_regex = r"tags svelte-.+"
+    artists_span = artists_span_container.find("span", {"class": re.compile(artists_span_regex)})
+
+    artists_regex = r"name svelte-.+"
+    artists = artists_span.find_all("span", {"class": re.compile(artists_regex)})
+
+    artists_extracted = []
+
+    for artist in artists:
+        artists_extracted.append(artist.get_text(strip=True))
+
+    return artists_extracted
 
 @time_logger
 def download(gallery_id: int, path: str="downloaded"):

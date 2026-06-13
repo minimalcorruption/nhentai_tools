@@ -6,6 +6,7 @@ from nhentai_tools.nhentai_tools import (
     extract_characters,
     extract_languages,
     extract_category,
+    extract_artists,
     download,
     tag_download
 )
