@@ -47,7 +47,7 @@ nhentai_tools.download(1337, path="gallery", metadata=True)
 ```python
 # Download all galleries from artist and embed metadata
 nhentai_tools.artist_download("coolsigma", True)
-#Downloaded files can be found in coolsigma/
+# Downloaded files can be found in coolsigma/
 
 # Download all galeries with specified character and embed metadata
 nhentai_tools.character_download("JetStream-Sam", True)
