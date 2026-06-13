@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nhentai_tools"
+version = "1.0.0"
+description = "A python library that allows you to interact with nhentai.net without API key (unofficial)"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "minimalcorruption", email = "74803408+minimalcorruption@users.noreply.github.com" }
+]
+requires-python = ">=3.9"
+dependencies = [
+    "requests>=2.34.2",
+    "beautifulsoup4>=4.15.0",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Text Processing :: Markup :: HTML",
+    "Topic :: Utilities",
+
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+
+    "Operating System :: OS Independent",
+]
+
+[project.optional-dependencies]
+dev = ["twine>=6.2.0"]
+
+[project.urls]
+Homepage = "https://github.com/minimalcorruption/nhentai_tools"
+Repository = "https://github.com/minimalcorruption/nhentai_tools"
+"Bug Tracker" = "https://github.com/minimalcorruption/nhentai_tools/issues"
+
+[tool.setuptools.packages.find]
+include = ["nhentai_tools*"]
