@@ -8,6 +8,7 @@ from nhentai_tools.nhentai_tools import (
     extract_category,
     extract_artists,
     extract_number_of_pages,
+    extract_parodies,
     download,
     tag_download
 )

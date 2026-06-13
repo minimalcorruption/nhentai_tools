@@ -204,6 +204,29 @@ def extract_number_of_pages(gallery_id: int) -> int:
 
     return pages[0].get_text(strip=True)
 
+def extract_parodies(gallery_id: int) -> list[str]:
+    gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=request_headers)
+
+    soup = BeautifulSoup(gallery.text, "html.parser")
+
+    parodies_container_regex = r"tag-container field-name svelte-.+"
+    parodies_container = soup.find_all("div", {"class": re.compile(parodies_container_regex)})
+
+    parodies_span_container = parodies_container[0]
+
+    parodies_span_regex = r"tags svelte-.+"
+    parodies_span = parodies_span_container.find("span", {"class": re.compile(parodies_span_regex)})
+
+    parodies_regex = r"name svelte-.+"
+    parodies = parodies_span.find_all("span", {"class": re.compile(parodies_regex)})
+
+    parodies_extracted = []
+
+    for parody in parodies:
+        parodies_extracted.append(parody.get_text(strip=True))
+
+    return parodies_extracted
+
 @time_logger
 def download(gallery_id: int, path: str="downloaded"):
     #Extracting gallery's data
