@@ -186,6 +186,24 @@ def extract_artists(gallery_id: int) -> list[str]:
 
     return artists_extracted
 
+def extract_number_of_pages(gallery_id: int) -> int:
+    gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=request_headers)
+
+    soup = BeautifulSoup(gallery.text, "html.parser")
+
+    pages_container_regex = r"tag-container field-name svelte-.+"
+    pages_container = soup.find_all("div", {"class": re.compile(pages_container_regex)})
+
+    pages_span_container = pages_container[7]
+
+    pages_span_regex = r"tags svelte-.+"
+    pages_span = pages_span_container.find("span", {"class": re.compile(pages_span_regex)})
+
+    pages_regex = r"name svelte-.+"
+    pages = pages_span.find_all("span", {"class": re.compile(pages_regex)})
+
+    return pages[0].get_text(strip=True)
+
 @time_logger
 def download(gallery_id: int, path: str="downloaded"):
     #Extracting gallery's data
