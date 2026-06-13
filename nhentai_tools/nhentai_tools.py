@@ -140,7 +140,7 @@ def extract_languages(gallery_id: int) -> list[str]:
 
     return languages_extracted
 
-def extract_category(gallery_id: int) -> list[str]:
+def extract_categories(gallery_id: int) -> list[str]:
     gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
 
     soup = BeautifulSoup(gallery.text, "html.parser")
@@ -227,8 +227,31 @@ def extract_parodies(gallery_id: int) -> list[str]:
 
     return parodies_extracted
 
+def extract_groups(gallery_id: int) -> list[str]:
+    gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
+
+    soup = BeautifulSoup(gallery.text, "html.parser")
+
+    groups_container_regex = r"tag-container field-name svelte-.+"
+    groups_container = soup.find_all("div", {"class": re.compile(groups_container_regex)})
+
+    groups_span_container = groups_container[4]
+
+    groups_span_regex = r"tags svelte-.+"
+    groups_span = groups_span_container.find("span", {"class": re.compile(groups_span_regex)})
+
+    groups_regex = r"name svelte-.+"
+    groups = groups_span.find_all("span", {"class": re.compile(groups_regex)})
+
+    groups_extracted = []
+
+    for groups in groups:
+        groups_extracted.append(groups.get_text(strip=True))
+
+    return groups_extracted
+
 @time_logger
-def download(gallery_id: int, path: str="downloaded"):
+def download(gallery_id: int, path: str="downloaded", metadata: bool=False):
     #Extracting gallery's data
     title = extract_title(gallery_id)
     server = extract_server(gallery_id)
@@ -276,6 +299,9 @@ def download(gallery_id: int, path: str="downloaded"):
         else:
             end = time.time()
             connectivity_check = -1
+
+    if metadata:
+        embed_metadata(extract_metadata(gallery_id), path)
 
     request.close()
 
@@ -385,7 +411,7 @@ def character_download(character: str):
 
 @time_logger
 def parody_download(parody: str):
-    init_page = requests.get(f"https://nhentai.net/parody/{parody}?sort=date", headers=request_headers)
+    init_page = requests.get(f"https://nhentai.net/parody/{parody}?sort=date", headers=HEADERS)
 
     soup = BeautifulSoup(init_page.text, "html.parser")
 
@@ -400,7 +426,7 @@ def parody_download(parody: str):
 
 
     for current_page in range(1, int(last_page) + 1):
-        parody_page = requests.get(f"https://nhentai.net/parody/{parody}?sort=date&page={current_page}", headers=request_headers)
+        parody_page = requests.get(f"https://nhentai.net/parody/{parody}?sort=date&page={current_page}", headers=HEADERS)
 
         soup = BeautifulSoup(parody_page.text, "html.parser")
 
@@ -435,3 +461,26 @@ def random_gallery():
     last_upload_id = last_upload_regex_match.group(0)
 
     return random.randint(1, int(last_upload_id))
+
+def extract_metadata(gallery_id: int) -> dict[str]:
+    metadata = {"title": extract_title(gallery_id),
+                 "parodies": extract_parodies(gallery_id),
+                 "characters": extract_characters(gallery_id),
+                 "tags": extract_tags(gallery_id),
+                 "artists": extract_artists(gallery_id),
+                 "groups": extract_groups(gallery_id),
+                 "languages": extract_languages(gallery_id),
+                 "categories": extract_categories(gallery_id)}
+    
+    return metadata
+
+def embed_metadata(metadata: dict, path: str):
+    with open(f"{path}/metadata.txt", "w") as metadata_file:
+        metadata_file.write(f"Title: {metadata['title']}\n")
+        metadata_file.write(f"Parodies: {metadata['parodies']}\n")
+        metadata_file.write(f"Characters: {metadata['characters']}\n")
+        metadata_file.write(f"Tags: {metadata['tags']}\n")
+        metadata_file.write(f"Artists: {metadata['artists']}\n")
+        metadata_file.write(f"Groups: {metadata['groups']}\n")
+        metadata_file.write(f"Languages: {metadata['languages']}\n")
+        metadata_file.write(f"Categories: {metadata['categories']}\n")

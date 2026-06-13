@@ -5,13 +5,16 @@ from nhentai_tools.nhentai_tools import (
     extract_tags,
     extract_characters,
     extract_languages,
-    extract_category,
+    extract_categories,
     extract_artists,
     extract_number_of_pages,
     extract_parodies,
+    extract_groups,
     download,
     tag_download,
     artist_download,
     character_download,
-    parody_download
+    parody_download,
+    extract_metadata,
+    embed_metadata
 )
