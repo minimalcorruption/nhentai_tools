@@ -117,6 +117,29 @@ def extract_characters(gallery_id: int) -> list[str]:
 
     return characters_extracted
 
+def extract_languages(gallery_id):
+    gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
+
+    soup = BeautifulSoup(gallery.text, "html.parser")
+
+    languages_container_regex = r"tag-container field-name svelte-.+"
+    languages_container = soup.find_all("div", {"class": re.compile(languages_container_regex)})
+
+    languages_span_container = languages_container[5]
+
+    languages_span_regex = r"tags svelte-.+"
+    languages_span = languages_span_container.find("span", {"class": re.compile(languages_span_regex)})
+
+    languages_regex = r"name svelte-.+"
+    languages = languages_span.find_all("span", {"class": re.compile(languages_regex)})
+
+    languages_extracted = []
+
+    for language in languages:
+        languages_extracted.append(language.get_text(strip=True))
+
+    return languages_extracted
+
 @time_logger
 def download(gallery_id: int, path: str="downloaded"):
     #Extracting gallery's data
