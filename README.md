@@ -51,10 +51,10 @@ nhentai_tools.artist_download("coolsigma", True)
 
 # Download all galeries with specified character and embed metadata
 nhentai_tools.character_download("JetStream-Sam", True)
-#Downloaded files can be found in JetStream-Sam/
+# Downloaded files can be found in JetStream-Sam/
 ```
 
-A library has more mass download functions, please refer to Wiki
+A library has more mass download functions, please refer to [wiki](https://github.com/minimalcorruption/nhentai_tools/wiki/Documentation)
 
 ### Working with metadata
 
@@ -66,6 +66,10 @@ var1 = nhentai_tools.extract_metadata(1337)
 nhentai_tools.embed_metadata(var1, path="sixseven")
 # File can be found in sixseven/metadata.txt
 ```
+
+## Documentation
+
+Full documentation can be found on [wiki](https://github.com/minimalcorruption/nhentai_tools/wiki/Documentation)
 
 ## Building
 
@@ -86,3 +90,10 @@ pip install .
 
 **_This project in beta, bugs are expected_<br>**
 **_If something goes wrong, please open an issue_**
+
+## AI Notice
+
+**_Some comments and docstrings has been written by an AI<br>_**
+**_Wkik has been written by an AI based on docstrings and comments<br>_**
+
+**I will get rid of AI-generated contenet in next releases**
