@@ -26,7 +26,7 @@ clear = lambda: print("\033[H\033[2J", end="")
 def extract_server(gallery_id: int) -> str:
     first_page = requests.get(f"https://nhentai.net/g/{gallery_id}/1/", headers=HEADERS)
 
-    soup = BeautifulSoup(first_page.content.decode(), "html.parser")
+    soup = BeautifulSoup(first_page.text, "html.parser")
 
     section = soup.find("section", {"id": "image-container"})
     section_a = section.find("a")
@@ -49,7 +49,7 @@ def extract_gallery_server_id(gallery_id: int) -> int:
         return -1
 
     #It finds first <img> tag with "lazyload" class which contains info about gallery
-    soup = BeautifulSoup(gallery_page.content.decode(), "html.parser")
+    soup = BeautifulSoup(gallery_page.text, "html.parser")
     first_image = soup.find("img", {"class": "lazyload"})
     
     #Extracting server side id from "src" attribute using regex, checking it for invalid ID and returning it
@@ -71,7 +71,7 @@ def extract_title(gallery_id: int) -> str:
         return -1
 
     #It finds first <img> tag with "lazyload" class
-    soup = BeautifulSoup(gallery_page.content.decode(), "html.parser")
+    soup = BeautifulSoup(gallery_page.text, "html.parser")
     first_image = soup.find("img", {"class": "lazyload"})
     
     return first_image['alt'].replace(" ", "-")
@@ -79,7 +79,7 @@ def extract_title(gallery_id: int) -> str:
 def extract_tags(gallery_id: int) -> list[str]:
     gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
 
-    soup = BeautifulSoup(gallery.content.decode(), "html.parser")
+    soup = BeautifulSoup(gallery.text, "html.parser")
 
     tag_class_regex = r"tagchip variant-pill state-normal svelte-.+"
     tags = soup.find_all("a", {"class": re.compile(tag_class_regex)})
@@ -93,6 +93,29 @@ def extract_tags(gallery_id: int) -> list[str]:
             clean_tags.append(match.group(1))
 
     return clean_tags
+
+def extract_characters(gallery_id: int) -> list[str]:
+    gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
+
+    soup = BeautifulSoup(gallery.text, "html.parser")
+
+    characters_container_regex = r"tag-container field-name svelte-.+"
+    characters_container = soup.find_all("div", {"class": re.compile(characters_container_regex)})
+
+    characters_span_container = characters_container[1]
+
+    characters_span_regex = r"tags svelte-.+"
+    characters_span = characters_span_container.find("span", {"class": re.compile(characters_span_regex)})
+
+    characters_regex = r"name svelte-.+"
+    characters = characters_span.find_all("span", {"class": re.compile(characters_regex)})
+
+    characters_extracted = []
+
+    for character in characters:
+        characters_extracted.append(character.get_text(strip=True))
+
+    return characters_extracted
 
 @time_logger
 def download(gallery_id: int, path: str="downloaded"):
@@ -150,7 +173,7 @@ def download(gallery_id: int, path: str="downloaded"):
 def tag_download(tag: str):
     init_page = requests.get(f"https://nhentai.net/tag/{tag}?sort=popular-today", headers=HEADERS)
 
-    soup = BeautifulSoup(init_page.content.decode(), "html.parser")
+    soup = BeautifulSoup(init_page.text, "html.parser")
 
     tag_regex = r"last svelte-.+"
 
@@ -164,7 +187,7 @@ def tag_download(tag: str):
     for current_page in range(1, int(last_page) + 1):
         tag_page = requests.get(f"https://nhentai.net/tag/{tag}?sort=popular-today&page={current_page}", headers=HEADERS)
 
-        soup = BeautifulSoup(tag_page.content.decode(), "html.parser")
+        soup = BeautifulSoup(tag_page.text, "html.parser")
 
         tag_regex = "gallery lang-\\w{2}"
 
@@ -183,7 +206,7 @@ def tag_download(tag: str):
 #Returns a pseudorandom gallery ID
 def random_gallery():
     nhentai_homepage = requests.get("https://nhentai.net/", headers=HEADERS)
-    soup = BeautifulSoup(nhentai_homepage.content.decode(), "html.parser")
+    soup = BeautifulSoup(nhentai_homepage.text, "html.parser")
 
     container = soup.find("div", {"class": "container index-container"})
 
