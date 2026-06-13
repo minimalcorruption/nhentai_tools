@@ -1,6 +1,5 @@
 <div align="center">
-  <img src="repo/ntools_logo.svg" width="200"/>
-  <h1>nhentai tools</h1>
+  <img src="https://raw.githubusercontent.com/minimalcorruption/nhentai_tools/main/repo/ntools_logo.svg" width="200"/>
   <p>Unofficial Python library for interacting with nhentai.net without API key.</p>
 
   <!-- Badges -->
