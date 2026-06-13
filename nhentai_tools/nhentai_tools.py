@@ -24,8 +24,6 @@ clear = lambda: print("\033[H\033[2J", end="")
 
 #Finds server which contains requested gallery
 def extract_server(gallery_id: int) -> str:
-    gallery_id = str(gallery_id)
-    
     first_page = requests.get(f"https://nhentai.net/g/{gallery_id}/1/", headers=HEADERS)
 
     soup = BeautifulSoup(first_page.content.decode(), "html.parser")
@@ -43,8 +41,6 @@ def extract_server(gallery_id: int) -> str:
 #nhentai has 2 IDs - the one that officially referenced on page (https://nhentai.net/g/(99999) - id) and server side id under which images are stored.
 #This function extracts server side id and returns it
 def extract_gallery_server_id(gallery_id: int) -> int:
-    gallery_id = str(gallery_id)
-    
     gallery_url = f"https://nhentai.net/g/{gallery_id}"
     gallery_page = requests.get(gallery_url, headers=HEADERS)
 
@@ -67,8 +63,6 @@ def extract_gallery_server_id(gallery_id: int) -> int:
 
 #This function extracts gallery's title
 def extract_title(gallery_id: int) -> str:
-    gallery_id = str(gallery_id)
-    
     gallery_url = f"https://nhentai.net/g/{gallery_id}"
     gallery_page = requests.get(gallery_url, headers=HEADERS)
 
@@ -82,19 +76,39 @@ def extract_title(gallery_id: int) -> str:
     
     return first_image['alt'].replace(" ", "-")
 
+def extract_tags(gallery_id: int) -> list[str]:
+    gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
+
+    soup = BeautifulSoup(gallery.content.decode(), "html.parser")
+
+    tag_class_regex = r"tagchip variant-pill state-normal svelte-.+"
+    tags = soup.find_all("a", {"class": re.compile(tag_class_regex)})
+
+    clean_tag_regex = r"/tag/([^/]+)/"
+    clean_tags = []
+
+    for tag in tags:
+        match = re.search(clean_tag_regex, tag['href'])
+        if match:
+            clean_tags.append(match.group(1))
+
+    return clean_tags
+
 @time_logger
 def download(gallery_id: int, path: str="downloaded"):
     #Extracting gallery's data
     title = extract_title(gallery_id)
     server = extract_server(gallery_id)
     gallery_server_id = extract_gallery_server_id(gallery_id)
+
+    path = f"{path}/{title}"
     
     #Checking if directory already exists and overrides it to avoid bugs  
-    if not os.path.exists(f"{path}/{title}"):
-        os.makedirs(f"{path}/{title}")
+    if not os.path.exists(path):
+        os.makedirs(path)
     else:
         print("Error: Directory already exists, please delete it first.")
-        print(f"Directory - {path}/{title}")
+        print(f"Directory - {path}")
         return
 
     connectivity_check = 0
@@ -111,8 +125,8 @@ def download(gallery_id: int, path: str="downloaded"):
     while connectivity_check == 0:
         current_image = f"{server}/galleries/{gallery_server_id}/{page_counter}.webp"
         current_image_jpg = f"{server}/galleries/{gallery_server_id}/{page_counter}.jpg"
-        current_image_path = f"{path}/{title}/{page_counter}.webp"
-        current_image_path_jpg = f"{path}/{title}/{page_counter}.jpg"
+        current_image_path = f"{path}/{page_counter}.webp"
+        current_image_path_jpg = f"{path}/{page_counter}.jpg"
         current_request = request.get(current_image)
         current_request_jpg = request.get(current_image_jpg)
         
@@ -164,7 +178,7 @@ def tag_download(tag: str):
 
             gallery_id = href_regex_match.group(0)
 
-            download(int(gallery_id), path="galleries")
+            download(int(gallery_id), path={tag})
 
 #Returns a pseudorandom gallery ID
 def random_gallery():
