@@ -11,5 +11,7 @@ from nhentai_tools.nhentai_tools import (
     extract_parodies,
     download,
     tag_download,
-    artist_download
+    artist_download,
+    character_download,
+    parody_download
 )

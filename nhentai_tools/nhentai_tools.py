@@ -348,6 +348,76 @@ def artist_download(artist: str):
 
             download(int(gallery_id), path=artist)
 
+@time_logger
+def character_download(character: str):
+    init_page = requests.get(f"https://nhentai.net/character/{character}?sort=date", headers=HEADERS)
+
+    soup = BeautifulSoup(init_page.text, "html.parser")
+
+    character_regex = r"last svelte-.+"
+
+    character_href = soup.find("a", {"class": re.compile(character_regex)})['href']
+
+    last_page_regex = rf"\d+"
+    last_page = re.search(last_page_regex, character_href).group(0)
+
+    current_page = 1
+
+
+    for current_page in range(1, int(last_page) + 1):
+        character_page = requests.get(f"https://nhentai.net/character/{character}?sort=date&page={current_page}", headers=HEADERS)
+
+        soup = BeautifulSoup(character_page.text, "html.parser")
+
+        character_regex = "gallery lang-\\w{2}"
+
+        galleries = soup.find_all("div", {"class": re.compile(character_regex)})
+        
+        for gallery in galleries:
+            current_href = gallery.find("a")['href']
+            href_regex = r"\d+"
+
+            href_regex_match = re.search(href_regex, current_href)
+
+            gallery_id = href_regex_match.group(0)
+
+            download(int(gallery_id), path=character)
+
+@time_logger
+def parody_download(parody: str):
+    init_page = requests.get(f"https://nhentai.net/parody/{parody}?sort=date", headers=request_headers)
+
+    soup = BeautifulSoup(init_page.text, "html.parser")
+
+    parody_regex = r"last svelte-.+"
+
+    parody_href = soup.find("a", {"class": re.compile(parody_regex)})['href']
+
+    last_page_regex = rf"\d+"
+    last_page = re.search(last_page_regex, parody_href).group(0)
+
+    current_page = 1
+
+
+    for current_page in range(1, int(last_page) + 1):
+        parody_page = requests.get(f"https://nhentai.net/parody/{parody}?sort=date&page={current_page}", headers=request_headers)
+
+        soup = BeautifulSoup(parody_page.text, "html.parser")
+
+        parody_regex = "gallery lang-\\w{2}"
+
+        galleries = soup.find_all("div", {"class": re.compile(parody_regex)})
+        
+        for gallery in galleries:
+            current_href = gallery.find("a")['href']
+            href_regex = r"\d+"
+
+            href_regex_match = re.search(href_regex, current_href)
+
+            gallery_id = href_regex_match.group(0)
+
+            download(int(gallery_id), path=parody)
+
 #Returns a pseudorandom gallery ID
 def random_gallery():
     nhentai_homepage = requests.get("https://nhentai.net/", headers=HEADERS)
