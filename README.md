@@ -43,7 +43,7 @@ character_download("JetStream-Sam", True)
 # Downloaded files can be found in JetStream-Sam/
 ```
 
-The library has more mass download functions, please refer to [wiki](https://github.com/minimalcorruption/nhentai_tools/wiki/Documentation)
+The library has more mass download functions, please refer to [Downloading](https://github.com/minimalcorruption/nhentai_tools/wiki/Documentation#downloading)
 
 ### Working with metadata
 
