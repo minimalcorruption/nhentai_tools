@@ -60,7 +60,7 @@ embed_metadata(meta, path="metadata")
 
 ## Documentation
 
-Full documentation can be found on [wiki](https://github.com/minimalcorruption/nhentai_tools/wiki/Documentation)
+Full documentation can be found on [Wiki](https://github.com/minimalcorruption/nhentai_tools/wiki/Documentation)
 
 ## Building
 
