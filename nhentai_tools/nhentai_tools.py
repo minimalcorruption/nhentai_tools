@@ -504,6 +504,8 @@ def tag_download(tag: str, metadata: bool=False):
     Accepts:
     Tag as string and Metadata flag
     """
+    tag = tag.replace(" ", "-")
+
     init_page = requests.get(f"https://nhentai.net/tag/{tag}?sort=popular-today", headers=HEADERS)
 
     #Check if gallery exists
@@ -552,6 +554,8 @@ def artist_download(artist: str, metadata: bool=False):
     Accepts: 
     Artist's name as string and Metadata flag
     """
+    artist = artist.replace(" ", "-")
+    
     init_page = requests.get(f"https://nhentai.net/artist/{artist}?sort=date", headers=HEADERS)
 
     #Check if gallery exists
@@ -600,6 +604,8 @@ def character_download(character: str, metadata: bool=False):
     Accepts:
     Character's name as string and Metadata flag
     """
+    character = character.replace(" ", "-")
+    
     init_page = requests.get(f"https://nhentai.net/character/{character}?sort=date", headers=HEADERS)
 
     #Check if gallery exists
@@ -648,6 +654,8 @@ def parody_download(parody: str, metadata: bool=False):
     Accepts:
     Parody as string and Metadata flag
     """
+    parody = parody.replace(" ", "-")
+    
     init_page = requests.get(f"https://nhentai.net/parody/{parody}?sort=date", headers=HEADERS)
 
     #Check if gallery exists
