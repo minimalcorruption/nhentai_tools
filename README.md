@@ -5,7 +5,7 @@
 
   <!-- Badges -->
 
-[![PyPI version](https://img.shields.io/pypi/v/nhentai_tools)](https://pypi.org/project/nhentai_tools/)
+[![PyPI version](https://badgen.net/pypi/v/nhentai-tools)](https://pypi.org/project/nhentai-tools/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md)
 
 </div>
