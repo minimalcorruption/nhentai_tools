@@ -22,10 +22,21 @@ def time_logger(func):
 
 def extract_server(gallery_id: int) -> str:
     """Extracts the server on which the supplied gallery's images are stored.
+    In case of errors returns int(-1)
 
     Accepts ID of nhentai's gallery
     """
     first_page = requests.get(f"https://nhentai.net/g/{gallery_id}/1/", headers=HEADERS)
+
+    #Check if gallery exists
+    if first_page.status_code == 404:
+        print("Gallery not found.")
+        return -1
+    
+    #Check if request was blocked
+    if first_page.status_code == 403:
+        print("Request was blocked by nhentai.")
+        return -1
 
     soup = BeautifulSoup(first_page.text, "html.parser")
 
@@ -44,14 +55,21 @@ def extract_server(gallery_id: int) -> str:
 def extract_gallery_server_id(gallery_id: int) -> int:
     """Extracts the server side ID of the supplied gallery and returns it.
     nhentai's galleries have 2 IDs - the one officially referenced on the page (https://nhentai.net/g/99999 - ID) and the server side ID under which images are stored.
-    
+    In case of errors returns int(-1)
+
     Accepts ID of nhentai's gallery
     """
     gallery_url = f"https://nhentai.net/g/{gallery_id}"
     gallery_page = requests.get(gallery_url, headers=HEADERS)
 
+    #Check if gallery exists
+    if gallery_page.status_code == 404:
+        print("Gallery not found.")
+        return -1
+    
     # Indicate blocked request
     if gallery_page.status_code == 403:
+        print("Request was blocked by nehntai.")
         return -1
 
     # It finds the first <img> tag with the "lazyload" class which contains info about the gallery
@@ -69,14 +87,21 @@ def extract_gallery_server_id(gallery_id: int) -> int:
 
 def extract_title(gallery_id: int) -> str:
     """Extracts the title of the supplied gallery and returns it, returns -1 if the request was blocked.
+    In case of errors returns int(-1)
 
     Accepts ID of nhentai's gallery
     """
     gallery_url = f"https://nhentai.net/g/{gallery_id}"
     gallery_page = requests.get(gallery_url, headers=HEADERS)
 
+    #Check if gallery exists
+    if gallery_page.status_code == 404:
+        print("Gallery not found.")
+        return -1
+    
     # Indicate blocked request
     if gallery_page.status_code == 403:
+        print("Request was blocked by nehntai.")
         return -1
 
     # It finds the first <img> tag with the "lazyload" class
@@ -87,10 +112,21 @@ def extract_title(gallery_id: int) -> str:
 
 def extract_tags(gallery_id: int) -> list[str]:
     """Extracts the gallery's tags and returns them as a list of strings.
+    In case of errors returns int(-1)
 
     Accepts ID of nhentai's gallery
     """
     gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
+
+    #Check if gallery exists
+    if gallery.status_code == 404:
+        print("Gallery not found.")
+        return -1
+    
+    # Indicate blocked request
+    if gallery.status_code == 403:
+        print("Request was blocked by nehntai.")
+        return -1
 
     soup = BeautifulSoup(gallery.text, "html.parser")
 
@@ -111,10 +147,21 @@ def extract_tags(gallery_id: int) -> list[str]:
 
 def extract_characters(gallery_id: int) -> list[str]:
     """Extracts the characters featured in the supplied gallery and returns them as a list.
+    In case of errors returns int(-1)
 
     Accepts ID of nhentai's gallery
     """
     gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
+
+    #Check if gallery exists
+    if gallery.status_code == 404:
+        print("Gallery not found.")
+        return -1
+    
+    # Indicate blocked request
+    if gallery.status_code == 403:
+        print("Request was blocked by nehntai.")
+        return -1
 
     soup = BeautifulSoup(gallery.text, "html.parser")
 
@@ -143,10 +190,21 @@ def extract_characters(gallery_id: int) -> list[str]:
 
 def extract_languages(gallery_id: int) -> list[str]:
     """Extracts the languages of the supplied gallery and returns them as a list.
+    In case of errors returns int(-1)
 
     Accepts ID of nhentai's gallery
     """
     gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
+
+    #Check if gallery exists
+    if gallery.status_code == 404:
+        print("Gallery not found.")
+        return -1
+    
+    # Indicate blocked request
+    if gallery.status_code == 403:
+        print("Request was blocked by nehntai.")
+        return -1
 
     soup = BeautifulSoup(gallery.text, "html.parser")
 
@@ -175,10 +233,21 @@ def extract_languages(gallery_id: int) -> list[str]:
 
 def extract_categories(gallery_id: int) -> list[str]:
     """Extracts the categories of the supplied gallery and returns them as a list.
+    In case of errors returns int(-1)
 
     Accepts ID of nhentai's gallery
     """
     gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
+    
+    #Check if gallery exists
+    if gallery.status_code == 404:
+        print("Gallery not found.")
+        return -1
+    
+    # Indicate blocked request
+    if gallery.status_code == 403:
+        print("Request was blocked by nehntai.")
+        return -1
 
     soup = BeautifulSoup(gallery.text, "html.parser")
 
@@ -207,10 +276,21 @@ def extract_categories(gallery_id: int) -> list[str]:
 
 def extract_artists(gallery_id: int) -> list[str]:
     """Extracts the artists of the supplied gallery and returns them as a list.
+    In case of errors returns int(-1)
 
     Accepts ID of nhentai's gallery
     """
     gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
+
+    #Check if gallery exists
+    if gallery.status_code == 404:
+        print("Gallery not found.")
+        return -1
+    
+    # Indicate blocked request
+    if gallery.status_code == 403:
+        print("Request was blocked by nehntai.")
+        return -1
 
     soup = BeautifulSoup(gallery.text, "html.parser")
 
@@ -239,36 +319,53 @@ def extract_artists(gallery_id: int) -> list[str]:
 
 def extract_number_of_pages(gallery_id: int) -> int:
     """Extracts the total number of pages in the supplied gallery and returns it as an integer.
+    In case of errors returns int(-1)
 
     Accepts ID of nhentai's gallery
     """
     gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
+
+    #Check if gallery exists
+    if gallery.status_code == 404:
+        print("Gallery not found.")
+        return -1
+    
+    # Indicate blocked request
+    if gallery.status_code == 403:
+        print("Request was blocked by nehntai.")
+        return -1
 
     soup = BeautifulSoup(gallery.text, "html.parser")
 
-    # Finds the container where the gallery's data is stored
-    pages_container_regex = r"tag-container field-name svelte-.+"
-    pages_container = soup.find_all("div", {"class": re.compile(pages_container_regex)})
+    pages_text = soup.find(string=re.compile(r"Pages:"))
+    
+    #Finds tag, that contains number of pages
+    tag_regex = r"tag-container"
+    pages_container = pages_text.find_parent("div", {"class": re.compile(tag_regex)})
+    
+    span_regex = r"^name"
+    pages_span = pages_container.find("span", {"class": re.compile(span_regex)})
 
-    # Finds the wrapper tags where the page counts are stored
-    pages_span_container = pages_container[7]
+    return int(pages_span.get_text(strip=True))
 
-    # Finds the wrapper tags where the page counts are stored
-    pages_span_regex = r"tags svelte-.+"
-    pages_span = pages_span_container.find("span", {"class": re.compile(pages_span_regex)})
-
-    # Finds all tags where the page counts are stored
-    pages_regex = r"name svelte-.+"
-    pages = pages_span.find_all("span", {"class": re.compile(pages_regex)})
-
-    return int(pages[0].get_text(strip=True))
 
 def extract_parodies(gallery_id: int) -> list[str]:
     """Extracts the parodies from the supplied gallery and returns them as a list.
+    In case of errors returns int(-1)
 
     Accepts ID of nhentai's gallery
     """
     gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
+
+    #Check if gallery exists
+    if gallery.status_code == 404:
+        print("Gallery not found.")
+        return -1
+    
+    # Indicate blocked request
+    if gallery.status_code == 403:
+        print("Request was blocked by nehntai.")
+        return -1
 
     soup = BeautifulSoup(gallery.text, "html.parser")
 
@@ -277,7 +374,10 @@ def extract_parodies(gallery_id: int) -> list[str]:
     parodies_container = soup.find_all("div", {"class": re.compile(parodies_container_regex)})
 
     # Finds the wrapper tags where parodies are stored
-    parodies_span_container = parodies_container[0]
+    if len(extract_parodies) < 7:
+        return "No parodies"
+    else:
+        parodies_span_container = parodies_container[0]
 
     # Finds the wrapper tags where parodies are stored
     parodies_span_regex = r"tags svelte-.+"
@@ -297,10 +397,21 @@ def extract_parodies(gallery_id: int) -> list[str]:
 
 def extract_groups(gallery_id: int) -> list[str]:
     """Extracts the groups of supplied gallery and returns them as a list.
+    In case of errors returns int(-1)
 
     Accepts ID of nhentai's gallery
     """
     gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
+
+    #Check if gallery exists
+    if gallery.status_code == 404:
+        print("Gallery not found.")
+        return -1
+    
+    # Indicate blocked request
+    if gallery.status_code == 403:
+        print("Request was blocked by nehntai.")
+        return -1
 
     soup = BeautifulSoup(gallery.text, "html.parser")
 
@@ -338,6 +449,10 @@ def download(gallery_id: int, path: str="downloaded", metadata: bool=False):
     title = extract_title(gallery_id)
     server = extract_server(gallery_id)
     gallery_server_id = extract_gallery_server_id(gallery_id)
+
+    if type(server) == int:
+        print("Gallery not found or request was blocked by nhentai.")
+        return
 
     path = f"{path}/{title}"
     
@@ -387,7 +502,19 @@ def tag_download(tag: str, metadata: bool=False):
     Accepts:
     Tag as string and Metadata flag
     """
+    tag = tag.replace(" ", "-")
+
     init_page = requests.get(f"https://nhentai.net/tag/{tag}?sort=popular-today", headers=HEADERS)
+
+    #Check if gallery exists
+    if init_page.status_code == 404:
+        print("Tag not found.")
+        return
+    
+    # Indicate blocked request
+    if init_page.status_code == 403:
+        print("Request was blocked by nhentai.")
+        return
 
     soup = BeautifulSoup(init_page.text, "html.parser")
 
@@ -425,7 +552,19 @@ def artist_download(artist: str, metadata: bool=False):
     Accepts: 
     Artist's name as string and Metadata flag
     """
+    artist = artist.replace(" ", "-")
+    
     init_page = requests.get(f"https://nhentai.net/artist/{artist}?sort=date", headers=HEADERS)
+
+    #Check if gallery exists
+    if init_page.status_code == 404:
+        print("Artist not found.")
+        return
+    
+    # Indicate blocked request
+    if init_page.status_code == 403:
+        print("Request was blocked by nhentai.")
+        return
 
     soup = BeautifulSoup(init_page.text, "html.parser")
 
@@ -463,7 +602,19 @@ def character_download(character: str, metadata: bool=False):
     Accepts:
     Character's name as string and Metadata flag
     """
+    character = character.replace(" ", "-")
+    
     init_page = requests.get(f"https://nhentai.net/character/{character}?sort=date", headers=HEADERS)
+
+    #Check if gallery exists
+    if init_page.status_code == 404:
+        print("Character not found.")
+        return
+    
+    # Indicate blocked request
+    if init_page.status_code == 403:
+        print("Request was blocked by nhentai.")
+        return
 
     soup = BeautifulSoup(init_page.text, "html.parser")
 
@@ -501,7 +652,19 @@ def parody_download(parody: str, metadata: bool=False):
     Accepts:
     Parody as string and Metadata flag
     """
+    parody = parody.replace(" ", "-")
+    
     init_page = requests.get(f"https://nhentai.net/parody/{parody}?sort=date", headers=HEADERS)
+
+    #Check if gallery exists
+    if init_page.status_code == 404:
+        print("Parody not found.")
+        return
+    
+    # Indicate blocked request
+    if init_page.status_code == 403:
+        print("Request was blocked by nhentai.")
+        return
 
     soup = BeautifulSoup(init_page.text, "html.parser")
 
@@ -538,6 +701,12 @@ def random_gallery():
     
     """
     nhentai_homepage = requests.get("https://nhentai.net/", headers=HEADERS)
+
+    #Check if request was blocked
+    if nhentai_homepage.status_code == 403:
+        print("Request was blocked by nhentai.")
+        return
+
     soup = BeautifulSoup(nhentai_homepage.text, "html.parser")
 
     # Isolating homepage main directory item container
@@ -561,6 +730,18 @@ def extract_metadata(gallery_id: int) -> dict:
 
     Accepts ID of nhentai's gallery
     """
+
+    #Check if gallery exists and request status
+    response = requests.get(f"https://nhentai.net/g{gallery_id}/", headers=HEADERS)
+
+    if response.status_code == 404:
+        print('Gallery not found.')
+        return
+    
+    if response.status_code == 403:
+        print("Request was blocked by nhentai.")
+        return
+
     metadata = {"title": extract_title(gallery_id),
                 "gallery id": gallery_id,
                  "parodies": extract_parodies(gallery_id),
@@ -578,6 +759,11 @@ def embed_metadata(metadata: dict, path: str):
 
     Accepts metadata as dict from extract_metadata() and path as string
     """
+    #Validate metadata
+    if metadata == None:
+        print("Gallery not found or request was blocked by nhentai.")
+        return
+
     with open(f"{path}/metadata.txt", "w") as metadata_file:
         metadata_file.write(f"Title: {metadata['title']}\n")
         metadata_file.write(f"Gallery ID: {metadata['gallery id']}")
