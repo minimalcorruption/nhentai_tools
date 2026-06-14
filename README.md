@@ -1,5 +1,6 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/minimalcorruption/nhentai_tools/main/repo/ntools_logo.svg" width="200"/>
+   <h1>nhentai tools</h1>
   <p>Unofficial Python library for interacting with nhentai.net without API key.</p>
 
   <!-- Badges -->
@@ -35,11 +36,11 @@ download(1337, path="gallery", metadata=True)
 from nhentai_tools import artist_download, character_download, tag_download, parody_download
 
 # Download all galleries from artist and embed metadata
-artist_download("coolsigma", True)
+artist_download("coolsigma", metadata=True)
 # Downloaded files can be found in coolsigma/
 
 # Download all galleries with specified character and embed metadata
-character_download("JetStream-Sam", True)
+character_download("JetStream-Sam", metadata=True)
 # Downloaded files can be found in JetStream-Sam/
 ```
 
