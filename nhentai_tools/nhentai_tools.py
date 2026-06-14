@@ -337,22 +337,17 @@ def extract_number_of_pages(gallery_id: int) -> int:
 
     soup = BeautifulSoup(gallery.text, "html.parser")
 
-    # Finds the container where the gallery's data is stored
-    pages_container_regex = r"tag-container field-name svelte-.+"
-    pages_container = soup.find_all("div", {"class": re.compile(pages_container_regex)})
+    pages_text = soup.find(string=re.compile(r"Pages:"))
+    
+    #Finds tag, that contains number of pages
+    tag_regex = r"tag-container"
+    pages_container = pages_text.find_parent("div", {"class": re.compile(tag_regex)})
+    
+    span_regex = r"^name"
+    pages_span = pages_container.find("span", {"class": re.compile(span_regex)})
 
-    # Finds the wrapper tags where the page counts are stored
-    pages_span_container = pages_container[7]
+    return int(pages_span.get_text(strip=True))
 
-    # Finds the wrapper tags where the page counts are stored
-    pages_span_regex = r"tags svelte-.+"
-    pages_span = pages_span_container.find("span", {"class": re.compile(pages_span_regex)})
-
-    # Finds all tags where the page counts are stored
-    pages_regex = r"name svelte-.+"
-    pages = pages_span.find_all("span", {"class": re.compile(pages_regex)})
-
-    return int(pages[0].get_text(strip=True))
 
 def extract_parodies(gallery_id: int) -> list[str]:
     """Extracts the parodies from the supplied gallery and returns them as a list.
@@ -379,7 +374,10 @@ def extract_parodies(gallery_id: int) -> list[str]:
     parodies_container = soup.find_all("div", {"class": re.compile(parodies_container_regex)})
 
     # Finds the wrapper tags where parodies are stored
-    parodies_span_container = parodies_container[0]
+    if len(extract_parodies) < 7:
+        return "No parodies"
+    else:
+        parodies_span_container = parodies_container[0]
 
     # Finds the wrapper tags where parodies are stored
     parodies_span_regex = r"tags svelte-.+"
