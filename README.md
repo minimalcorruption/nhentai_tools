@@ -13,7 +13,7 @@
 ## Installation
 
 ```bash
-pip install nhentai_tools
+pip install nhentai-tools
 ```
 
 **nhentai tools requires python >= 3.9**
