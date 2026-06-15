@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nhentai_tools"
-version = "1.0.1"
+version = "1.0.2"
 description = "A python library that allows you to interact with nhentai.net without API key (unofficial)"
 readme = "README.md"
 license = "MIT"

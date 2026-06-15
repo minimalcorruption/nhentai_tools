@@ -165,26 +165,31 @@ def extract_characters(gallery_id: int) -> list[str]:
 
     soup = BeautifulSoup(gallery.text, "html.parser")
 
-    # Finds the container where the gallery's data is stored
-    characters_container_regex = r"tag-container field-name svelte-.+"
-    characters_container = soup.find_all("div", {"class": re.compile(characters_container_regex)})
+    characters_text = soup.find(string=re.compile(r"Characters:"))
+    
+    #Finds tag that characters
+    tag_regex = r"tag-container"
+    
+    # Checks if characters are present
+    try:
+        characters_container = characters_text.find_parent("div", {"class": re.compile(tag_regex)})
+    except AttributeError:
+        return ["No characters"]
 
-    # Selects the tag where characters are stored
-    characters_span_container = characters_container[1]
+    regex = r"tagchip variant-pill state-normal svelte-.+"
 
-    # Finds the wrapper tags where characters are stored
-    characters_span_regex = r"tags svelte-.+"
-    characters_span = characters_span_container.find("span", {"class": re.compile(characters_span_regex)})
-
-    # Finds all tags where characters are stored
-    characters_regex = r"name svelte-.+"
-    characters = characters_span.find_all("span", {"class": re.compile(characters_regex)})
+    characters = characters_container.find_all("a", {"class": re.compile(regex)})
 
     characters_extracted = []
 
-    # Extracts characters from tags
-    for character in characters:
-        characters_extracted.append(character.get_text(strip=True))
+    # Iterates through characters and appends characters_extracted
+    for parody in characters:
+        page_href = parody['href']
+        
+        parody_regex = r"/character/(.+)/"
+        parody_match = re.search(parody_regex, page_href)
+
+        characters_extracted.append(parody_match.group(1)) 
 
     return characters_extracted
 
@@ -208,26 +213,31 @@ def extract_languages(gallery_id: int) -> list[str]:
 
     soup = BeautifulSoup(gallery.text, "html.parser")
 
-    # Finds the container where the gallery's data is stored
-    languages_container_regex = r"tag-container field-name svelte-.+"
-    languages_container = soup.find_all("div", {"class": re.compile(languages_container_regex)})
+    languages_text = soup.find(string=re.compile(r"Languages:"))
+    
+    #Finds tag that languages
+    tag_regex = r"tag-container"
+    
+    # Checks if languages are present
+    try:
+        languages_container = languages_text.find_parent("div", {"class": re.compile(tag_regex)})
+    except AttributeError:
+        return ["No languages"]
 
-    # Finds the wrapper tags where languages are stored
-    languages_span_container = languages_container[5]
+    regex = r"tagchip variant-pill state-normal svelte-.+"
 
-    # Finds the wrapper tags where languages are stored
-    languages_span_regex = r"tags svelte-.+"
-    languages_span = languages_span_container.find("span", {"class": re.compile(languages_span_regex)})
-
-    # Finds all tags where languages are stored
-    languages_regex = r"name svelte-.+"
-    languages = languages_span.find_all("span", {"class": re.compile(languages_regex)})
+    languages = languages_container.find_all("a", {"class": re.compile(regex)})
 
     languages_extracted = []
 
-    # Extracts languages from tags
-    for language in languages:
-        languages_extracted.append(language.get_text(strip=True))
+    # Iterates through languages and appends languages_extracted
+    for parody in languages:
+        page_href = parody['href']
+        
+        parody_regex = r"/language/(.+)/"
+        parody_match = re.search(parody_regex, page_href)
+
+        languages_extracted.append(parody_match.group(1)) 
 
     return languages_extracted
 
@@ -251,27 +261,33 @@ def extract_categories(gallery_id: int) -> list[str]:
 
     soup = BeautifulSoup(gallery.text, "html.parser")
 
-    # Finds the container where the gallery's data is stored
-    categories_container_regex = r"tag-container field-name svelte-.+"
-    categories_container = soup.find_all("div", {"class": re.compile(categories_container_regex)})
+    categories_text = soup.find(string=re.compile(r"Categories:"))
+    
+    #Finds tag that categories
+    tag_regex = r"tag-container"
+    
+    # Checks if categories are present
+    try:
+        categories_container = categories_text.find_parent("div", {"class": re.compile(tag_regex)})
+    except AttributeError:
+        return ["No categories"]
 
-    # Finds the wrapper tags where categories are stored
-    categories_span_container = categories_container[6]
+    regex = r"tagchip variant-pill state-normal svelte-.+"
 
-    # Finds the wrapper tags where categories are stored
-    categories_span_regex = r"tags svelte-.+"
-    categories_span = categories_span_container.find("span", {"class": re.compile(categories_span_regex)})
-
-    # Finds all tags where categories are stored
-    categories_regex = r"name svelte-.+"
-    categories = categories_span.find_all("span", {"class": re.compile(categories_regex)})
+    categories = categories_container.find_all("a", {"class": re.compile(regex)})
 
     categories_extracted = []
 
-    # Extracts categories from tags
-    for category in categories:
-        categories_extracted.append(category.get_text(strip=True))
+    # Iterates through categories and appends categories_extracted
+    for parody in categories:
+        page_href = parody['href']
+        
+        parody_regex = r"/category/(.+)/"
+        parody_match = re.search(parody_regex, page_href)
 
+        categories_extracted.append(parody_match.group(1)) 
+
+     
     return categories_extracted
 
 def extract_artists(gallery_id: int) -> list[str]:
@@ -339,7 +355,7 @@ def extract_number_of_pages(gallery_id: int) -> int:
 
     pages_text = soup.find(string=re.compile(r"Pages:"))
     
-    #Finds tag, that contains number of pages
+    #Finds tag that contains number of pages
     tag_regex = r"tag-container"
     pages_container = pages_text.find_parent("div", {"class": re.compile(tag_regex)})
     
@@ -369,30 +385,33 @@ def extract_parodies(gallery_id: int) -> list[str]:
 
     soup = BeautifulSoup(gallery.text, "html.parser")
 
-    # Finds the container where the gallery's data is stored
-    parodies_container_regex = r"tag-container field-name svelte-.+"
-    parodies_container = soup.find_all("div", {"class": re.compile(parodies_container_regex)})
+    parodies_text = soup.find(string=re.compile(r"Parodies:"))
+    
+    #Finds tag that parodies
+    tag_regex = r"tag-container"
+    
+    # Checks if parodies are present
+    try:
+        parodies_container = parodies_text.find_parent("div", {"class": re.compile(tag_regex)})
+    except AttributeError:
+        return ["No Parodies"]
 
-    # Finds the wrapper tags where parodies are stored
-    if len(extract_parodies) < 7:
-        return "No parodies"
-    else:
-        parodies_span_container = parodies_container[0]
+    regex = r"tagchip variant-pill state-normal svelte-.+"
 
-    # Finds the wrapper tags where parodies are stored
-    parodies_span_regex = r"tags svelte-.+"
-    parodies_span = parodies_span_container.find("span", {"class": re.compile(parodies_span_regex)})
-
-    # Finds all tags where parodies are stored
-    parodies_regex = r"name svelte-.+"
-    parodies = parodies_span.find_all("span", {"class": re.compile(parodies_regex)})
+    parodies = parodies_container.find_all("a", {"class": re.compile(regex)})
 
     parodies_extracted = []
 
-    # Extracts parodies from tags
+    # Iterates through parodies and appends parodies_extracted
     for parody in parodies:
-        parodies_extracted.append(parody.get_text(strip=True))
+        page_href = parody['href']
+        
+        parody_regex = r"/parody/(.+)/"
+        parody_match = re.search(parody_regex, page_href)
 
+        parodies_extracted.append(parody_match.group(1)) 
+
+     
     return parodies_extracted
 
 def extract_groups(gallery_id: int) -> list[str]:
@@ -415,27 +434,33 @@ def extract_groups(gallery_id: int) -> list[str]:
 
     soup = BeautifulSoup(gallery.text, "html.parser")
 
-    # Finds the container where the gallery's data is stored
-    groups_container_regex = r"tag-container field-name svelte-.+"
-    groups_container = soup.find_all("div", {"class": re.compile(groups_container_regex)})
+    groups_text = soup.find(string=re.compile(r"Groups:"))
+    
+    #Finds tag that groups
+    tag_regex = r"tag-container"
+    
+    # Checks if groups are present
+    try:
+        groups_container = groups_text.find_parent("div", {"class": re.compile(tag_regex)})
+    except AttributeError:
+        return ["No groups"]
 
-    # Finds the wrapper tags where groups are stored
-    groups_span_container = groups_container[4]
+    regex = r"tagchip variant-pill state-normal svelte-.+"
 
-    # Finds the wrapper tags where groups are stored
-    groups_span_regex = r"tags svelte-.+"
-    groups_span = groups_span_container.find("span", {"class": re.compile(groups_span_regex)})
-
-    # Finds all tags where groups are stored
-    groups_regex = r"name svelte-.+"
-    groups = groups_span.find_all("span", {"class": re.compile(groups_regex)})
+    groups = groups_container.find_all("a", {"class": re.compile(regex)})
 
     groups_extracted = []
 
-    # Extracts groups from tags (Fixed loop variable typo conflict)
-    for group in groups:
-        groups_extracted.append(group.get_text(strip=True))
+    # Iterates through groups and appends groups_extracted
+    for parody in groups:
+        page_href = parody['href']
+        
+        parody_regex = r"/group/(.+)/"
+        parody_match = re.search(parody_regex, page_href)
 
+        groups_extracted.append(parody_match.group(1)) 
+
+     
     return groups_extracted
 
 
@@ -732,7 +757,7 @@ def extract_metadata(gallery_id: int) -> dict:
     """
 
     #Check if gallery exists and request status
-    response = requests.get(f"https://nhentai.net/g{gallery_id}/", headers=HEADERS)
+    response = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
 
     if response.status_code == 404:
         print('Gallery not found.')
@@ -766,7 +791,7 @@ def embed_metadata(metadata: dict, path: str):
 
     with open(f"{path}/metadata.txt", "w") as metadata_file:
         metadata_file.write(f"Title: {metadata['title']}\n")
-        metadata_file.write(f"Gallery ID: {metadata['gallery id']}")
+        metadata_file.write(f"Gallery ID: {metadata['gallery id']}\n")
         metadata_file.write(f"Parodies: {metadata['parodies']}\n")
         metadata_file.write(f"Characters: {metadata['characters']}\n")
         metadata_file.write(f"Tags: {metadata['tags']}\n")
