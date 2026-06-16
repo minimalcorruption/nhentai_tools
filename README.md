@@ -16,7 +16,7 @@
 pip install nhentai-tools
 ```
 
-**nhentai tools requires python >= 3.9**
+**nhentai tools requires Python >= 3.9**
 
 ## Basic Usage
 
