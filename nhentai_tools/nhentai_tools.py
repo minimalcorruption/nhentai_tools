@@ -309,28 +309,34 @@ def extract_artists(gallery_id: int) -> list[str]:
         return -1
 
     soup = BeautifulSoup(gallery.text, "html.parser")
+   
+    artists_text = soup.find(string=re.compile(r"Artists:"))
+    
+    #Finds tag that artists
+    tag_regex = r"tag-container"
+    
+    # Checks if artists are present
+    try:
+        artists_container = artists_text.find_parent("div", {"class": re.compile(tag_regex)})
+    except AttributeError:
+        return ["No artists"]
 
-    # Finds the container where the gallery's data is stored
-    artists_container_regex = r"tag-container field-name svelte-.+"
-    artists_container = soup.find_all("div", {"class": re.compile(artists_container_regex)})
+    regex = r"tagchip variant-pill state-normal svelte-.+"
 
-    # Finds the wrapper tags where artists are stored
-    artists_span_container = artists_container[3]
-
-    # Finds the wrapper tags where artists are stored
-    artists_span_regex = r"tags svelte-.+"
-    artists_span = artists_span_container.find("span", {"class": re.compile(artists_span_regex)})
-
-    # Finds all tags where artists are stored
-    artists_regex = r"name svelte-.+"
-    artists = artists_span.find_all("span", {"class": re.compile(artists_regex)})
+    artists = artists_container.find_all("a", {"class": re.compile(regex)})
 
     artists_extracted = []
 
-    # Extracts artists from tags
-    for artist in artists:
-        artists_extracted.append(artist.get_text(strip=True))
+    # Iterates through artists and appends artists_extracted
+    for parody in artists:
+        page_href = parody['href']
+        
+        parody_regex = r"/artist/(.+)/"
+        parody_match = re.search(parody_regex, page_href)
 
+        artists_extracted.append(parody_match.group(1)) 
+
+     
     return artists_extracted
 
 def extract_number_of_pages(gallery_id: int) -> int:
