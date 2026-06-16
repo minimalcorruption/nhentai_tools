@@ -40,7 +40,7 @@ artist_download("coolsigma", metadata=True)
 # Downloaded files can be found in coolsigma/
 
 # Download all galleries with specified character and embed metadata
-character_download("JetStream-Sam", metadata=True)
+character_download("JetStream Sam", metadata=True)
 # Downloaded files can be found in JetStream-Sam/
 ```
 
