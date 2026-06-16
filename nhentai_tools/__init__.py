@@ -1,20 +1,15 @@
-from nhentai_tools.nhentai_tools import (
+from nhentai_tools.downloading import *
+from nhentai_tools.extraction import (
     extract_server,
     extract_gallery_server_id,
     extract_title,
+    extract_number_of_pages,
+    extract_artists,
     extract_tags,
     extract_characters,
-    extract_languages,
-    extract_categories,
-    extract_artists,
-    extract_number_of_pages,
-    extract_parodies,
     extract_groups,
-    download,
-    tag_download,
-    artist_download,
-    character_download,
-    parody_download,
-    extract_metadata,
-    embed_metadata
+    extract_parodies,
+    extract_categories,
+    extract_languages
 )
+from nhentai_tools.metadata import *
