@@ -1,7 +1,7 @@
 import requests
 
-from utils import HEADERS
-from extraction import *
+from nhentai_tools.utils import HEADERS
+from nhentai_tools.extraction import *
 
 def extract_metadata(gallery_id: int) -> dict:
     """Extrcats all metadata from supplied gallery

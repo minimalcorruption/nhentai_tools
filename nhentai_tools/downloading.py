@@ -3,8 +3,8 @@ from bs4 import BeautifulSoup
 import re
 import os
 
-from extraction import *
-from metadata import *
+from nhentai_tools.extraction import *
+from nhentai_tools.metadata import *
 
 
 def download(gallery_id: int, path: str="downloaded", metadata: bool=False):
