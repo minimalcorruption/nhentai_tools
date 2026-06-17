@@ -122,48 +122,7 @@ def tag_download(tag: str, metadata: bool=False):
     Accepts:
     Tag as string and Metadata flag
     """
-    tag = tag.replace(" ", "-")
-
-    init_page = requests.get(f"https://nhentai.net/tag/{tag}?sort=date", headers=HEADERS)
-
-    #Check if gallery exists
-    if init_page.status_code == 404:
-        print("Tag not found.")
-        return
-    
-    # Indicate blocked request
-    if init_page.status_code == 403:
-        print("Request was blocked by nhentai.")
-        return
-
-    soup = BeautifulSoup(init_page.text, "html.parser")
-
-    # Finding pagination controls to determine the last page
-    tag_regex = r"last svelte-.+"
-    tag_href = soup.find("a", {"class": re.compile(tag_regex)})['href']
-
-    last_page_regex = rf"\d+"
-    last_page = re.search(last_page_regex, tag_href).group(0)
-
-    # Iterating through all pages of the specific tag
-    for current_page in range(1, int(last_page) + 1):
-        tag_page = requests.get(f"https://nhentai.net/tag/{tag}?sort=popular-today&page={current_page}", headers=HEADERS)
-
-        soup = BeautifulSoup(tag_page.text, "html.parser")
-
-        # Parsing list of galleries on the current page
-        tag_regex = "gallery lang-\\w{2}"
-        galleries = soup.find_all("div", {"class": re.compile(tag_regex)})
-        
-        # Extracting IDs and passing them into the central download worker
-        for gallery in galleries:
-            current_href = gallery.find("a")['href']
-            href_regex = r"\d+"
-
-            href_regex_match = re.search(href_regex, current_href)
-            gallery_id = href_regex_match.group(0)
-
-            download(int(gallery_id), path=tag, metadata=metadata)
+    return _mass_download(category="tag", name=tag, metadata=metadata)
 
 
 def artist_download(artist: str, metadata: bool=False):
@@ -181,49 +140,7 @@ def character_download(character: str, metadata: bool=False):
     Accepts:
     Character's name as string and Metadata flag
     """
-    character = character.replace(" ", "-")
-    
-    init_page = requests.get(f"https://nhentai.net/character/{character}?sort=date", headers=HEADERS)
-
-    #Check if gallery exists
-    if init_page.status_code == 404:
-        print("Character not found.")
-        return
-    
-    # Indicate blocked request
-    if init_page.status_code == 403:
-        print("Request was blocked by nhentai.")
-        return
-
-    soup = BeautifulSoup(init_page.text, "html.parser")
-
-    # Finding pagination controls to determine the last page
-    character_regex = r"last svelte-.+"
-    character_href = soup.find("a", {"class": re.compile(character_regex)})['href']
-
-    last_page_regex = rf"\d+"
-    last_page = re.search(last_page_regex, character_href).group(0)
-
-    # Iterating through all pages containing the character
-    for current_page in range(1, int(last_page) + 1):
-        character_page = requests.get(f"https://nhentai.net/character/{character}?sort=date&page={current_page}", headers=HEADERS)
-
-        soup = BeautifulSoup(character_page.text, "html.parser")
-
-        # Parsing list of galleries on the current page
-        character_regex = "gallery lang-\\w{2}"
-        galleries = soup.find_all("div", {"class": re.compile(character_regex)})
-        
-        # Extracting IDs and downloading
-        for gallery in galleries:
-            current_href = gallery.find("a")['href']
-            href_regex = r"\d+"
-
-            href_regex_match = re.search(href_regex, current_href)
-            gallery_id = href_regex_match.group(0)
-
-            download(int(gallery_id), path=character, metadata=metadata)
-
+    return _mass_download(category="character", name=character, metadata=metadata)
 
 def parody_download(parody: str, metadata: bool=False):
     """Scrapes and downloads all galleries under a specific parody sorted by date.
@@ -231,45 +148,4 @@ def parody_download(parody: str, metadata: bool=False):
     Accepts:
     Parody as string and Metadata flag
     """
-    parody = parody.replace(" ", "-")
-    
-    init_page = requests.get(f"https://nhentai.net/parody/{parody}?sort=date", headers=HEADERS)
-
-    #Check if gallery exists
-    if init_page.status_code == 404:
-        print("Parody not found.")
-        return
-    
-    # Indicate blocked request
-    if init_page.status_code == 403:
-        print("Request was blocked by nhentai.")
-        return
-
-    soup = BeautifulSoup(init_page.text, "html.parser")
-
-    # Finding pagination controls to determine the last page
-    parody_regex = r"last svelte-.+"
-    parody_href = soup.find("a", {"class": re.compile(parody_regex)})['href']
-
-    last_page_regex = rf"\d+"
-    last_page = re.search(last_page_regex, parody_href).group(0)
-
-    # Iterating through all pages containing the parody category
-    for current_page in range(1, int(last_page) + 1):
-        parody_page = requests.get(f"https://nhentai.net/parody/{parody}?sort=date&page={current_page}", headers=HEADERS)
-
-        soup = BeautifulSoup(parody_page.text, "html.parser")
-
-        # Parsing list of galleries on the current page
-        parody_regex = "gallery lang-\\w{2}"
-        galleries = soup.find_all("div", {"class": re.compile(parody_regex)})
-        
-        # Extracting IDs and downloading
-        for gallery in galleries:
-            current_href = gallery.find("a")['href']
-            href_regex = r"\d+"
-
-            href_regex_match = re.search(href_regex, current_href)
-            gallery_id = href_regex_match.group(0)
-
-            download(int(gallery_id), path=parody, metadata=metadata)
+    return _mass_download(category="parody", name=parody, metadata=metadata)
