@@ -7,6 +7,58 @@ from nhentai_tools.extraction import *
 from nhentai_tools.metadata import *
 
 
+def _mass_download(category: str, name: str, metadata: bool) -> bool:
+    name_formatted = name.replace(" ", "-")
+
+    init_page = requests.get(f"https://nhentai.net/{category}/{name_formatted}?sort=date", headers=HEADERS)
+
+    #Check if gallery exists
+    if init_page.status_code == 404:
+        print(f"{category.capitalize()} not found.")
+        return False
+    
+    # Indicate blocked request
+    if init_page.status_code == 403:
+        print("Request was blocked by nhentai.")
+        return False
+
+    soup = BeautifulSoup(init_page.text, "html.parser")
+
+    last_page = ""
+
+    # Finding pagination controls to determine the last page
+    try:    
+        category_regex = r"last svelte-.+"
+        category_href = soup.find("a", {"class": re.compile(category_regex)})['href']
+        last_page_regex = rf"\d+"
+        last_page = re.search(last_page_regex, category_href).group(0)
+    except TypeError:
+        last_page = "1"
+
+
+    # Iterating through all pages of the specific category
+    for current_page in range(1, int(last_page) + 1):
+        category_page = requests.get(f"https://nhentai.net/{category}/{name_formatted}?sort=date&page={current_page}", headers=HEADERS)
+
+        soup = BeautifulSoup(category_page.text, "html.parser")
+
+        # Parsing list of galleries on the current page
+        tag_regex = "gallery lang-\\w{2}"
+        galleries = soup.find_all("div", {"class": re.compile(tag_regex)})
+        
+        # Extracting IDs and passing them into the central download worker
+        for gallery in galleries:
+            current_href = gallery.find("a")['href']
+            href_regex = r"\d+"
+
+            href_regex_match = re.search(href_regex, current_href)
+            gallery_id = href_regex_match.group(0)
+
+            download(int(gallery_id), path=name_formatted, metadata=metadata)
+
+    return True
+
+
 def download(gallery_id: int, path: str="downloaded", metadata: bool=False):
     """Downloads all images from the requested gallery into specified path and optionally saves metadata.
 
@@ -65,14 +117,14 @@ def download(gallery_id: int, path: str="downloaded", metadata: bool=False):
 
 
 def tag_download(tag: str, metadata: bool=False):
-    """Scrapes and downloads all galleries under specified tag sorted by today's popularity.
+    """Scrapes and downloads all galleries under specified tag sorted by date.
 
     Accepts:
     Tag as string and Metadata flag
     """
     tag = tag.replace(" ", "-")
 
-    init_page = requests.get(f"https://nhentai.net/tag/{tag}?sort=popular-today", headers=HEADERS)
+    init_page = requests.get(f"https://nhentai.net/tag/{tag}?sort=date", headers=HEADERS)
 
     #Check if gallery exists
     if init_page.status_code == 404:
@@ -120,48 +172,7 @@ def artist_download(artist: str, metadata: bool=False):
     Accepts: 
     Artist's name as string and Metadata flag
     """
-    artist = artist.replace(" ", "-")
-    
-    init_page = requests.get(f"https://nhentai.net/artist/{artist}?sort=date", headers=HEADERS)
-
-    #Check if gallery exists
-    if init_page.status_code == 404:
-        print("Artist not found.")
-        return
-    
-    # Indicate blocked request
-    if init_page.status_code == 403:
-        print("Request was blocked by nhentai.")
-        return
-
-    soup = BeautifulSoup(init_page.text, "html.parser")
-
-    # Finding pagination controls to determine the last page
-    artist_regex = r"last svelte-.+"
-    artist_href = soup.find("a", {"class": re.compile(artist_regex)})['href']
-
-    last_page_regex = rf"\d+"
-    last_page = re.search(last_page_regex, artist_href).group(0)
-
-    # Iterating through all pages of the artist's library
-    for current_page in range(1, int(last_page) + 1):
-        artist_page = requests.get(f"https://nhentai.net/artist/{artist}?sort=date&page={current_page}", headers=HEADERS)
-
-        soup = BeautifulSoup(artist_page.text, "html.parser")
-
-        # Parsing list of galleries on the current page
-        artist_regex = "gallery lang-\\w{2}"
-        galleries = soup.find_all("div", {"class": re.compile(artist_regex)})
-        
-        # Extracting IDs and downloading
-        for gallery in galleries:
-            current_href = gallery.find("a")['href']
-            href_regex = r"\d+"
-
-            href_regex_match = re.search(href_regex, current_href)
-            gallery_id = href_regex_match.group(0)
-
-            download(int(gallery_id), path=artist, metadata=metadata)
+    return _mass_download(category="artist", name=artist, metadata=metadata)
 
 
 def character_download(character: str, metadata: bool=False):

@@ -1,8 +1,9 @@
 from nhentai_tools import *
 import pytest
+import shutil
 
 def test_extract_title():
-    assert(extract_title(655922)) == "[Mimonel]-W-Gal-to-Shuudengo-Hotel-Ecchi-|-åè¾£å¦¹ä¸æ²¡èµ¶ä¸æ«ç­è½¦çéåºè²è²â¥-(Blue-Archive)-[Chinese]-[æ¬¶æ¾æ±åç»]"
+    assert(extract_title(655922)) == "[Mimonel] W Gal to Shuudengo Hotel Ecchi | 双辣妹与没赶上末班车的酒店色色♥ (Blue Archive) [Chinese] [欶澜汉化组]".replace(" ", "-")
 
 def test_extract_tags():
     assert(extract_tags(655922)) == ['big-breasts', 'sole-male', 'group', 'full-color', 'ffm-threesome', 'collar', 'tail', 'horns', 'gyaru', 'halo']
@@ -27,3 +28,7 @@ def test_extract_categories():
 
 def test_extract_number_of_pages():
     assert(extract_number_of_pages(655922)) == 11
+
+def test_artist_download():
+    assert(artist_download(artist="fujitaka kinsei", metadata=True)) == True
+    shutil.rmtree("fujitaka-kinsei")

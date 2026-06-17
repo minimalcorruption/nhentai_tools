@@ -5,6 +5,11 @@ import re
 from nhentai_tools.utils import HEADERS
 
 def _extract(gallery_id: int, value: str) -> list[str]:
+    """Shared worker for metadata extraction
+
+    Accepts gallery's ID as int and value that need to be extracted\n
+    Returns data as list of strings
+    """
     gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
     
     #Check if gallery exists
@@ -121,28 +126,24 @@ def extract_gallery_server_id(gallery_id: int) -> int:
     return int(gallery_server_id_match.group(0))
 
 def extract_title(gallery_id: int) -> str:
-    """Extracts the title of the supplied gallery and returns it, returns -1 if the request was blocked.
-    In case of errors returns int(-1)
-
-    Accepts ID of nhentai's gallery
-    """
     gallery_url = f"https://nhentai.net/g/{gallery_id}"
     gallery_page = requests.get(gallery_url, headers=HEADERS)
+    gallery_page.encoding = 'utf-8'
 
-    #Check if gallery exists
     if gallery_page.status_code == 404:
-        print("Gallery not found.")
         return -1
-    
-    # Indicate blocked request
     if gallery_page.status_code == 403:
-        print("Request was blocked by nehntai.")
         return -1
 
-    # It finds the first <img> tag with the "lazyload" class
     soup = BeautifulSoup(gallery_page.text, "html.parser")
-    first_image = soup.find("img", {"class": "lazyload"})
-    
+
+    # Find tag that contains title
+    cover = soup.find("div", {"id": "cover"})
+    first_image = cover.find("img")
+
+    if first_image is None:
+        return -1
+
     return first_image['alt'].replace(" ", "-")
 
 def extract_number_of_pages(gallery_id: int) -> int:
@@ -153,7 +154,7 @@ def extract_number_of_pages(gallery_id: int) -> int:
     """
     gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
 
-    #Check if gallery exists
+    # Check if gallery exists
     if gallery.status_code == 404:
         print("Gallery not found.")
         return -1
