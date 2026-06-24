@@ -5,6 +5,7 @@ from nhentai_tools.downloading import (
     parody_download,
     character_download
 )
+
 from nhentai_tools.extraction import (
     extract_server,
     extract_gallery_server_id,
@@ -18,4 +19,7 @@ from nhentai_tools.extraction import (
     extract_categories,
     extract_languages
 )
+
 from nhentai_tools.metadata import *
+
+from nhentai_tools.exceptions import *

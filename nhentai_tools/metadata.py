@@ -3,6 +3,8 @@ import requests
 from nhentai_tools.utils import HEADERS
 from nhentai_tools.extraction import *
 
+from nhentai_tools.exceptions import *
+
 def extract_metadata(gallery_id: int) -> dict:
     """Extrcats all metadata from supplied gallery
 
@@ -13,12 +15,10 @@ def extract_metadata(gallery_id: int) -> dict:
     response = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
 
     if response.status_code == 404:
-        print('Gallery not found.')
-        return
+        raise GalleryNotFoundError("Gallery not found.")
     
     if response.status_code == 403:
-        print("Request was blocked by nhentai.")
-        return
+        raise RequestBlockedError("Request was blocked by nhentai.")
 
     metadata = {"title": extract_title(gallery_id),
                 "gallery id": gallery_id,
@@ -37,11 +37,6 @@ def embed_metadata(metadata: dict, path: str):
 
     Accepts metadata as dict from extract_metadata() and path as string
     """
-    #Validate metadata
-    if metadata == None:
-        print("Gallery not found or request was blocked by nhentai.")
-        return
-
     with open(f"{path}/metadata.txt", "w") as metadata_file:
         metadata_file.write(f"Title: {metadata['title']}\n")
         metadata_file.write(f"Gallery ID: {metadata['gallery id']}\n")

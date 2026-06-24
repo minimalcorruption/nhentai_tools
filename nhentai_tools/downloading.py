@@ -6,7 +6,7 @@ import os
 from nhentai_tools.extraction import *
 from nhentai_tools.metadata import *
 
-from exceptions import *
+from nhentai_tools.exceptions import *
 
 
 def _mass_download(category: str, name: str, metadata: bool) -> bool:
@@ -59,7 +59,7 @@ def _mass_download(category: str, name: str, metadata: bool) -> bool:
     return True
 
 
-def download(gallery_id: int, path: str="downloaded", metadata: bool=False):
+def download(gallery_id: int, path: str="downloaded", metadata: bool=False) -> bool:
     """Downloads all images from the requested gallery into specified path and optionally saves metadata.
 
     Accepts:
@@ -110,6 +110,8 @@ def download(gallery_id: int, path: str="downloaded", metadata: bool=False):
         embed_metadata(extract_metadata(gallery_id), path)
 
     request.close()
+
+    return True
 
 
 def tag_download(tag: str, metadata: bool=False):

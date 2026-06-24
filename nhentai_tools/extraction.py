@@ -4,7 +4,7 @@ import re
 
 from nhentai_tools.utils import HEADERS
 
-from exceptions import *
+from nhentai_tools.exceptions import *
 
 def _extract(gallery_id: int, value: str) -> list[str]:
     """Shared worker for metadata extraction
@@ -20,7 +20,7 @@ def _extract(gallery_id: int, value: str) -> list[str]:
     
     # Indicate blocked request
     if gallery.status_code == 403:
-        raise RequestBlockedError("Request was blocked by nehntai.")
+        raise RequestBlockedError("Request was blocked by nhentai.")
     
     value_plural = ""
 
@@ -70,13 +70,9 @@ def extract_server(gallery_id: int) -> str:
 
     #Check if gallery exists
     if first_page.status_code == 404:
-        print("Gallery not found.")
-        return -1
-    
-    #Check if request was blocked
+        raise GalleryNotFoundError("Gallery not found.")
     if first_page.status_code == 403:
-        print("Request was blocked by nhentai.")
-        return -1
+        raise RequestBlockedError("Request was blocked by nhentai.")
 
     soup = BeautifulSoup(first_page.text, "html.parser")
 
@@ -104,24 +100,24 @@ def extract_gallery_server_id(gallery_id: int) -> int:
 
     #Check if gallery exists
     if gallery_page.status_code == 404:
-        print("Gallery not found.")
-        return -1
-    
-    # Indicate blocked request
+        raise GalleryNotFoundError("Gallery not found.")
     if gallery_page.status_code == 403:
-        print("Request was blocked by nehntai.")
-        return -1
+        raise RequestBlockedError("Request was blocked by nhentai.")
 
-    # It finds the first <img> tag with the "lazyload" class which contains info about the gallery
+    # It finds the first <img> tag which contains info about the gallery
     soup = BeautifulSoup(gallery_page.text, "html.parser")
-    first_image = soup.find("img", {"class": "lazyload"})
+    cover = soup.find("div", {"id": "cover"})
+    first_image = cover.find("img") if cover else None
+
+    if first_image is None:
+        raise AttributeError("first_image is empty.")
     
     # Extracting the server side ID from the "src" attribute using regex, checking it for an invalid ID and returning it
     gallery_server_id_regex = re.compile(r"\d{2,}")
     try:
         gallery_server_id_match = gallery_server_id_regex.search(first_image['src'])
     except TypeError:
-        return None
+        raise AttributeError("Invalid gallery's server ID.")
     
     return int(gallery_server_id_match.group(0))
 
@@ -131,18 +127,18 @@ def extract_title(gallery_id: int) -> str:
     gallery_page.encoding = 'utf-8'
 
     if gallery_page.status_code == 404:
-        return -1
+        raise GalleryNotFoundError("Gallery not found.")
     if gallery_page.status_code == 403:
-        return -1
+        raise RequestBlockedError("Request was blocked by nhentai.")
 
     soup = BeautifulSoup(gallery_page.text, "html.parser")
 
     # Find tag that contains title
-    cover = soup.find("div", {"id": "cover"})
-    first_image = cover.find("img")
+    soup = BeautifulSoup(gallery_page.text, "html.parser")
+    first_image = soup.find("img", {"class": "lazyload"})
 
     if first_image is None:
-        return -1
+       raise AttributeError("first_image is empty.")
 
     return first_image['alt'].replace(" ", "-")
 
@@ -154,15 +150,10 @@ def extract_number_of_pages(gallery_id: int) -> int:
     """
     gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
 
-    # Check if gallery exists
     if gallery.status_code == 404:
-        print("Gallery not found.")
-        return -1
-    
-    # Indicate blocked request
+        raise GalleryNotFoundError("Gallery not found.")
     if gallery.status_code == 403:
-        print("Request was blocked by nehntai.")
-        return -1
+        raise RequestBlockedError("Request was blocked by nhentai.")
 
     soup = BeautifulSoup(gallery.text, "html.parser")
 
@@ -179,7 +170,7 @@ def extract_number_of_pages(gallery_id: int) -> int:
 
 def extract_tags(gallery_id: int) -> list[str]:
     """Extracts the gallery's tags and returns them as a list of strings.
-    In case of errors returns int(-1)
+    In case of errors raises exception.
 
     Accepts ID of nhentai's gallery
     """
@@ -187,7 +178,7 @@ def extract_tags(gallery_id: int) -> list[str]:
 
 def extract_characters(gallery_id: int) -> list[str]:
     """Extracts the characters featured in the supplied gallery and returns them as a list.
-    In case of errors returns int(-1)
+    In case of errors raises exception.
 
     Accepts ID of nhentai's gallery
     """
@@ -195,7 +186,7 @@ def extract_characters(gallery_id: int) -> list[str]:
 
 def extract_languages(gallery_id: int) -> list[str]:
     """Extracts the languages of the supplied gallery and returns them as a list.
-    In case of errors returns int(-1)
+    In case of errors raises exception.
 
     Accepts ID of nhentai's gallery
     """
@@ -204,7 +195,7 @@ def extract_languages(gallery_id: int) -> list[str]:
 
 def extract_categories(gallery_id: int) -> list[str]:
     """Extracts the categories of the supplied gallery and returns them as a list.
-    In case of errors returns int(-1)
+    In case of errors raises exception.
 
     Accepts ID of nhentai's gallery
     """
@@ -212,7 +203,7 @@ def extract_categories(gallery_id: int) -> list[str]:
 
 def extract_artists(gallery_id: int) -> list[str]:
     """Extracts the artists of the supplied gallery and returns them as a list.
-    In case of errors returns int(-1)
+    In case of errors raises exception.
 
     Accepts ID of nhentai's gallery
     """
@@ -220,7 +211,7 @@ def extract_artists(gallery_id: int) -> list[str]:
     
 def extract_parodies(gallery_id: int) -> list[str]:
     """Extracts the parodies from the supplied gallery and returns them as a list.
-    In case of errors returns int(-1)
+    In case of errors raises exception.
 
     Accepts ID of nhentai's gallery
     """
@@ -228,7 +219,7 @@ def extract_parodies(gallery_id: int) -> list[str]:
 
 def extract_groups(gallery_id: int) -> list[str]:
     """Extracts the groups of supplied gallery and returns them as a list.
-    In case of errors returns int(-1)
+    In case of errors raises exception.
 
     Accepts ID of nhentai's gallery
     """
