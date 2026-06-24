@@ -6,6 +6,8 @@ import os
 from nhentai_tools.extraction import *
 from nhentai_tools.metadata import *
 
+from exceptions import *
+
 
 def _mass_download(category: str, name: str, metadata: bool) -> bool:
     name_formatted = name.replace(" ", "-")
@@ -14,13 +16,11 @@ def _mass_download(category: str, name: str, metadata: bool) -> bool:
 
     #Check if gallery exists
     if init_page.status_code == 404:
-        print(f"{category.capitalize()} not found.")
-        return False
+        raise GalleryNotFoundError(f"{category.capitalize()} not found.")
     
     # Indicate blocked request
     if init_page.status_code == 403:
-        print("Request was blocked by nhentai.")
-        return False
+        raise RequestBlockedError("Request was blocked by nhentai.")
 
     soup = BeautifulSoup(init_page.text, "html.parser")
 
@@ -69,10 +69,6 @@ def download(gallery_id: int, path: str="downloaded", metadata: bool=False):
     title = extract_title(gallery_id)
     server = extract_server(gallery_id)
     gallery_server_id = extract_gallery_server_id(gallery_id)
-
-    if type(server) == int:
-        print("Gallery not found or request was blocked by nhentai.")
-        return
 
     path = f"{path}/{title}"
     

@@ -4,6 +4,8 @@ import re
 
 from nhentai_tools.utils import HEADERS
 
+from exceptions import *
+
 def _extract(gallery_id: int, value: str) -> list[str]:
     """Shared worker for metadata extraction
 
@@ -14,13 +16,11 @@ def _extract(gallery_id: int, value: str) -> list[str]:
     
     #Check if gallery exists
     if gallery.status_code == 404:
-        print("Gallery not found.")
-        return -1
+        raise GalleryNotFoundError('Gallery not found.')
     
     # Indicate blocked request
     if gallery.status_code == 403:
-        print("Request was blocked by nehntai.")
-        return -1
+        raise RequestBlockedError("Request was blocked by nehntai.")
     
     value_plural = ""
 
