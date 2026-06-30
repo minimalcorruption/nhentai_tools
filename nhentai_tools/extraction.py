@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import re
+import time
+import random
 
 from nhentai_tools.utils import HEADERS
 
@@ -12,6 +14,9 @@ def _extract(gallery_id: int, value: str) -> list[str]:
     Accepts gallery's ID as int and value that need to be extracted\n
     Returns data as list of strings
     """
+    # Extra delay to avoid rate limiting
+    time.sleep(random.uniform(1, 3))
+
     gallery = requests.get(f"https://nhentai.net/g/{gallery_id}/", headers=HEADERS)
     
     #Check if gallery exists
@@ -130,15 +135,16 @@ def extract_title(gallery_id: int) -> str:
         raise GalleryNotFoundError("Gallery not found.")
     if gallery_page.status_code == 403:
         raise RequestBlockedError("Request was blocked by nhentai.")
-
-    soup = BeautifulSoup(gallery_page.text, "html.parser")
+    if gallery_page.status_code == 429:
+        raise RequestBlockedError("You have been rate limited.")
 
     # Find tag that contains title
     soup = BeautifulSoup(gallery_page.text, "html.parser")
-    first_image = soup.find("img", {"class": "lazyload"})
+    cover = soup.find("div", {"id": "cover"})
+    first_image = cover.find("img") if cover else None
 
     if first_image is None:
-       raise AttributeError("first_image is empty.")
+       raise AttributeError(f"first_image is empty. Gallery - {gallery_id}")
 
     return first_image['alt'].replace(" ", "-")
 

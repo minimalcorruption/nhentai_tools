@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import os
+import time
+import random
 
 from nhentai_tools.extraction import *
 from nhentai_tools.metadata import *
@@ -36,7 +38,7 @@ def _mass_download(category: str, name: str, metadata: bool) -> bool:
         last_page = "1"
 
 
-    # Iterating through all pages of the specific category
+    # Iterating through all pages of the specified category
     for current_page in range(1, int(last_page) + 1):
         category_page = requests.get(f"https://nhentai.net/{category}/{name_formatted}?sort=date&page={current_page}", headers=HEADERS)
 
@@ -56,6 +58,9 @@ def _mass_download(category: str, name: str, metadata: bool) -> bool:
 
             download(int(gallery_id), path=name_formatted, metadata=metadata)
 
+        # Sleep to avoid rate limit
+        time.sleep(random.randint(15, 50))
+    
     return True
 
 
@@ -78,7 +83,7 @@ def download(gallery_id: int, path: str="downloaded", metadata: bool=False) -> b
     else:
         print("Error: Directory already exists, please delete it first.")
         print(f"Directory - {path}")
-        return
+        return False
 
     page_counter = 1
 

@@ -31,10 +31,12 @@ def test_extract_number_of_pages():
 
 def test_artist_download():
     try:
-        result = artist_download(artist="fujitaka kinsei", metadata=True)
-        assert result == True
+        assert(artist_download(artist="fujitaka kinsei", metadata=True)) == True
     finally:
         shutil.rmtree("fujitaka-kinsei", ignore_errors=True)
 
 def test_download():
-    download(656623)
+    try:    
+        assert(download(656623, metadata=True)) == True
+    finally:
+        shutil.rmtree("downloaded", ignore_errors=True)
